@@ -1,51 +1,67 @@
-const int trigPin = 9;
-const int echoPin = 10;
+int trigPin = 9;    // trig pin of HC-SR04
+int echoPin = 10;   // Echo pin of HC-SR04
 
-const int mtr_1_a = 3;
-const int mtr_1_b = 4;
-const int mtr_2_a = 5;
-const int mtr_2_b = 6;
+int revleft4 = 4;   //REVerse motion of Left motor
+int fwdleft5 = 5;   //ForWarD motion of Left motor
+int revright6 = 6;    //REVerse motion of Right motor
+int fwdright7 = 7;    //ForWarD motion of Right motor
 
-long duration;
-long distance;
+long duration, distance;
 
-void setup(){
-  for(int i = 5; i <= 9; i++){
-    pinMode(i, OUTPUT);
-  }
+void setup() {
   
-  pinMode(10, INPUT);
+  delay(random(500,2000));    // delay for random time
   Serial.begin(9600);
+  pinMode(revleft4, OUTPUT);    // set Motor pins as output
+  pinMode(fwdleft5, OUTPUT);
+  pinMode(revright6, OUTPUT);
+  pinMode(fwdright7, OUTPUT);
+  
+  pinMode(trigPin, OUTPUT);   // set trig pin as output
+  pinMode(echoPin, INPUT);    //set echo pin as input to capture reflected waves
 }
 
-void loop(){
+void loop() {
+
   digitalWrite(trigPin, LOW);
-  delayMicroseconds(2);
-
-  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(2);   
+  digitalWrite(trigPin, HIGH);    // send waves for 10 us
   delayMicroseconds(10);
-
-  duration = pulseIn(echoPin, HIGH);
-
-  distance = duration * 0.034 / 2;
-
-  Serial.print("Distance: ");
-  Serial.println(distance);
-
-  if(distance <= 25 || distance > 800){
-    for(int i = 3; i <= 6; i++){
-      digitalWrite(i, LOW);
-    }
-
-    // digitalWrite(3, LOW);
-    // digitalWrite(4, LOW);
-
-  } else {
-    digitalWrite(mtr_1_a, HIGH);
-    digitalWrite(mtr_1_b, LOW);
-
-    digitalWrite(mtr_2_a, HIGH);
-    digitalWrite(mtr_2_b, LOW);
+  duration = pulseIn(echoPin, HIGH); // receive reflected waves
+  distance = duration / 58.2;   // convert to distance
+  delay(10);
+  
+      // If you dont get proper movements of your robot then alter the pin numbers
+  if (distance > 19)
+  {
+    digitalWrite(fwdright7, HIGH);    // move forward
+    digitalWrite(revright6, LOW);
+    digitalWrite(fwdleft5, HIGH);
+    digitalWrite(revleft4, LOW);
   }
-  delay(5);
+
+  if (distance < 18)
+  {
+    digitalWrite(fwdright7, LOW);   //Stop
+    digitalWrite(revright6, LOW);
+    digitalWrite(fwdleft5, LOW);
+    digitalWrite(revleft4, LOW);
+    delay(500);
+    digitalWrite(fwdright7, LOW);   //movebackword
+    digitalWrite(revright6, HIGH);
+    digitalWrite(fwdleft5, LOW);
+    digitalWrite(revleft4, HIGH);
+    delay(500);
+    digitalWrite(fwdright7, LOW);   //Stop
+    digitalWrite(revright6, LOW);
+    digitalWrite(fwdleft5, LOW);
+    digitalWrite(revleft4, LOW);
+    delay(100);
+    digitalWrite(fwdright7, HIGH);
+    digitalWrite(revright6, LOW);
+    digitalWrite(revleft4, LOW);
+    digitalWrite(fwdleft5, LOW);
+    delay(500);
+  }
+
 }
